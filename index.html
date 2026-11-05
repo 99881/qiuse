@@ -18,7 +18,9 @@ html,body{margin:0;padding:0;background:#f8f5ec;color:#26302b;
 h1{font-family:"Songti SC","Songti TC",serif;font-size:32px;line-height:1.34;margin:10px 0 0;font-weight:600}
 .meta{margin-top:12px;font-size:14px;color:#5f6d64;line-height:1.85}
 .route{margin-top:14px;font-size:13.5px;color:#6f7d74;line-height:1.8}
-.cards{display:grid;gap:12px;margin-top:26px}
+h2{font-family:"Songti SC","Songti TC",serif;font-size:20px;margin:30px 0 8px;font-weight:600}
+.hint{font-size:13px;color:#8a958c;line-height:1.75;margin:0 0 12px}
+.cards{display:grid;gap:12px;margin-top:14px}
 a.card{display:flex;align-items:center;gap:14px;background:#fffdf7;border:1px solid #e6e0cf;
   border-radius:16px;padding:16px 18px;text-decoration:none;color:#26302b;min-height:64px}
 a.card:active{background:#f1ece0}
@@ -27,10 +29,12 @@ a.card .ico{flex:none;width:38px;height:38px;border-radius:12px;background:#eef2
 a.card b{display:block;font-size:16px;font-weight:600}
 a.card span{display:block;font-size:12.5px;color:#8a958c;margin-top:1px}
 a.card .go{flex:none;color:#c9a24a;font-size:18px}
-h2{font-family:"Songti SC","Songti TC",serif;font-size:20px;margin:32px 0 10px;font-weight:600}
+a.card .pill{display:inline-block;font-size:10.5px;line-height:1.5;color:#3f6b52;border:1px solid #c9dbcd;
+  background:#eef5ef;border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.sep{height:1px;background:#e6e0cf;margin:26px 0 6px}
 .note{background:#fbf4e2;border:1px dashed #d9bd7d;border-radius:14px;padding:14px 16px;
   font-size:13px;line-height:1.8;color:#6b5a2e;margin-top:14px}
-.small{font-size:12px;color:#93a096;line-height:1.7;margin-top:10px}
+.small{font-size:12px;color:#93a096;line-height:1.7;margin-top:12px}
 footer{margin-top:34px;padding-top:16px;border-top:1px solid #e6e0cf;font-size:12px;color:#9aa79d;line-height:1.8}
 </style>
 </head>
@@ -46,40 +50,65 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid #e6e0cf;font-size:1
   井冈山茨坪 → 黄洋界 → 信丰（脐橙园）→ 深圳</div>
 </div>
 
+<h2>先看哪个</h2>
+<p class="hint">网慢或只想快点看内容 → <b>纯文字版</b>（109 KB，秒开）<br>
+想看银杏和沿途照片 → <b>省流量版</b>（620 KB）<br>
+要打印、发给别人 → 下面的 <b>PDF</b></p>
+
 <div class="cards">
-  <a class="card" href="phone.html">
-    <div class="ico">📱</div>
-    <div style="flex:1"><b>手机版全文</b><span>逐日 A／B／C、吃住补能、清单、任务卡，一页看全</span></div>
-    <div class="go">›</div>
-  </a>
   <a class="card" href="text.html">
     <div class="ico">⚡</div>
-    <div style="flex:1"><b>纯文字版 · 秒开</b><span>没有任何图片，109 KB，最慢的网络也能打开</span></div>
+    <div style="flex:1"><b>纯文字版<span class="pill">推荐</span></b><span>逐日 A／B／C、吃住补能、清单、任务卡，无图秒开</span></div>
     <div class="go">›</div>
   </a>
   <a class="card" href="phone-lite.html">
     <div class="ico">🚀</div>
-    <div style="flex:1"><b>手机版 · 省流量</b><span>同样内容，图片压小，弱网或流量紧张时用这个</span></div>
+    <div style="flex:1"><b>省流量版</b><span>内容同上，图片压到 620 KB</span></div>
     <div class="go">›</div>
   </a>
-  <a class="card" href="roadbook.pdf">
+  <a class="card" href="phone.html">
+    <div class="ico">📱</div>
+    <div style="flex:1"><b>完整版 · 2 MB</b><span>原图原尺寸，Wi‑Fi 下看最舒服</span></div>
+    <div class="go">›</div>
+  </a>
+</div>
+
+<div class="sep"></div>
+<h2>打印版</h2>
+<div class="cards">
+  <a class="card" href="roadbook.pdf" target="_blank" rel="noopener">
     <div class="ico">📕</div>
     <div style="flex:1"><b>路书 · 15 页</b><span>封面、路线图、日程、天气、看点、逐日</span></div>
     <div class="go">›</div>
   </a>
-  <a class="card" href="checklist.pdf">
+  <a class="card" href="checklist.pdf" target="_blank" rel="noopener">
     <div class="ico">✅</div>
     <div style="flex:1"><b>准备清单 · 5 页</b><span>倒计时、车辆补能、药箱、衣物、预算</span></div>
     <div class="go">›</div>
   </a>
-  <a class="card" href="cards.pdf">
+  <a class="card" href="cards.pdf" target="_blank" rel="noopener">
     <div class="ico">🎴</div>
     <div style="flex:1"><b>任务卡 · 7 页</b><span>9 天 9 个身份 + 空白卡 + 护照</span></div>
     <div class="go">›</div>
   </a>
+</div>
+
+<div class="sep"></div>
+<h2>导航与下载</h2>
+<div class="cards">
   <a class="card" href="map.html">
     <div class="ico">🗺</div>
     <div style="flex:1"><b>交互地图</b><span>19 个节点，按天筛选，点击跳高德（需联网）</span></div>
+    <div class="go">›</div>
+  </a>
+  <a class="card" href="nodes.csv">
+    <div class="ico">📄</div>
+    <div style="flex:1"><b>地图节点表 CSV</b><span>19 行，含经纬度与高德链接</span></div>
+    <div class="go">›</div>
+  </a>
+  <a class="card" href="notes.html">
+    <div class="ico">📝</div>
+    <div style="flex:1"><b>说明与修订记录</b><span>改了哪些、还差什么要确认</span></div>
     <div class="go">›</div>
   </a>
 </div>
@@ -89,20 +118,6 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid #e6e0cf;font-size:1
   ① 11/14 首日全程有雨（65%），17:00 没到零陵就直接进城，古城不去了。<br>
   ② 11/15 是九天里最好的一天（25%），银杏日按 A 方案 07:30 出发。<br>
   ③ 11/18—20 连冷三天：韶山 8—13℃、茨坪 6—14℃、黄洋界清晨 3—5℃，羽绒、帽子、围巾都带上。
-</div>
-
-<h2>下载带走</h2>
-<div class="cards" style="margin-top:10px">
-  <a class="card" href="nodes.csv">
-    <div class="ico">📄</div>
-    <div style="flex:1"><b>地图节点表 CSV</b><span>19 行，含经纬度与高德链接</span></div>
-    <div class="go">›</div>
-  </a>
-  <a class="card" href="notes.md">
-    <div class="ico">📝</div>
-    <div style="flex:1"><b>说明与本次修订记录</b><span>改了哪些、还差什么要确认</span></div>
-    <div class="go">›</div>
-  </a>
 </div>
 
 <p class="small">PDF 在手机上会直接打开，点右上角可以「存储到文件」或用系统分享打印；
