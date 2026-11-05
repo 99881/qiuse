@@ -1,0 +1,208 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>2026 父女秋色自驾 · 地图节点</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="vendor/markercluster.css">
+<link rel="stylesheet" href="vendor/markercluster.default.css">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; color: #26302b; }
+body { display: flex; flex-direction: column; background: #f6f5ef; }
+header { padding: 12px 20px 0; background: #fbfaf6; border-bottom: 1px solid #e0e4dc; }
+.hrow { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+h1 { font-family: "Songti SC", serif; font-size: 22px; margin: 0; }
+.sub { font-size: 12px; color: #6f7d74; margin: 0 0 3px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 0 12px; }
+.chip { border: 1px solid #d5dbd3; background: #fff; color: #4d5c53; border-radius: 20px; padding: 4px 10px; font-size: 11.5px; cursor: pointer; white-space: nowrap; }
+.chip:hover { border-color: #a9741f; }
+.chip.on { background: #26302b; color: #fff; border-color: #26302b; }
+.chip .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.main { flex: 1; display: flex; min-height: 0; }
+aside { width: 320px; background: #fbfaf6; border-right: 1px solid #e0e4dc; overflow-y: auto; padding: 14px 14px 40px; }
+aside h2 { font-size: 12px; letter-spacing: .08em; color: #8a968d; margin: 18px 0 8px; font-weight: 600; }
+aside h2:first-child { margin-top: 0; }
+.card { background: #fff; border: 1px solid #e4e8e0; border-radius: 8px; padding: 8px 10px; margin-bottom: 7px; cursor: pointer; transition: .15s; }
+.card:hover { border-color: #c9a24a; transform: translateX(2px); }
+.card .n { font-size: 13px; font-weight: 600; display: flex; gap: 6px; align-items: baseline; }
+.card .n i { font-style: normal; font-size: 10px; color: #fff; background: #999; border-radius: 50%; width: 17px; height: 17px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.card .a { font-size: 11px; color: #7c8880; margin-top: 2px; }
+.card .m { display: flex; gap: 8px; font-size: 10px; color: #a9741f; margin-top: 3px; }
+#map { position: absolute; inset: 0; }
+.legend { margin-bottom: 20px; background: rgba(255,255,255,.95); padding: 8px 10px; border-radius: 8px; font-size: 11px; line-height: 1.7; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+.legend b { font-size: 11px; }
+.legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+.note { position: absolute; left: 12px; bottom: 12px; z-index: 500; background: rgba(251,250,246,.94); border: 1px solid #e0e4dc; border-radius: 6px; font-size: 10.5px; color: #7c8880; padding: 6px 9px; max-width: 420px; }
+.pin { display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; font-weight: 700; border: 2px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.3); font-size: 11px; }
+.pin.sm { width: 18px; height: 18px; font-size: 9px; }
+.pin.big { width: 26px; height: 26px; font-size: 12px; }
+.pop b { font-size: 13px; }
+.pop .p1 { font-size: 11px; color: #7c8880; margin: 2px 0 4px; }
+.pop .p2 { font-size: 11.5px; margin: 2px 0; }
+.pop a { display: inline-block; margin-top: 6px; font-size: 11px; color: #fff; background: #245773; text-decoration: none; padding: 3px 8px; border-radius: 4px; }
+.cluster { width:34px;height:34px;border-radius:50%;background:#26302b;color:#fbfaf6;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid #fbfaf6;box-shadow:0 1px 8px rgba(0,0,0,.35); }
+.daylabel { background: rgba(38,48,43,.82); color: #fff; border: none; border-radius: 3px; padding: 1px 5px; font-size: 10px; }
+#tileBtn { position: absolute; right: 14px; top: 84px; z-index: 800; background: rgba(251,250,246,.96);
+  border: 1px solid #dde2da; border-radius: 20px; padding: 9px 16px; font-size: 13px; color: #26302b;
+  box-shadow: 0 2px 10px rgba(0,0,0,.14); }
+#listBtn { display: none; position: absolute; left: 50%; transform: translateX(-50%); bottom: 22px; z-index: 900;
+  background: #26302b; color: #fff; border: none; border-radius: 26px; padding: 13px 22px; font-size: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.28); align-items: center; gap: 8px; }
+#sheetBg { display: none; position: fixed; inset: 0; background: rgba(15,20,17,.38); z-index: 1100; }
+#sheetBg.show { display: block; }
+@media (max-width: 860px) {
+  header { padding: 10px 14px 0; }
+  .hrow h1 { font-size: 17px; }
+  .hrow .sub { display: none; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding: 8px 0 10px; -webkit-overflow-scrolling: touch; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; padding: 9px 14px; font-size: 13px; }
+  .main { position: relative; }
+  aside { position: fixed; left: 0; right: 0; bottom: 0; width: auto; height: 64vh; z-index: 1200;
+    border-right: none; border-top: 1px solid #e0e4dc; border-radius: 20px 20px 0 0; padding: 8px 16px 30px;
+    transform: translateY(106%); transition: transform .26s ease; box-shadow: 0 -10px 34px rgba(0,0,0,.2); }
+  aside.open { transform: translateY(0); }
+  aside:before { content: ""; display: block; width: 44px; height: 5px; border-radius: 3px; background: #d5dbd3; margin: 2px auto 10px; }
+  aside h2 { margin-top: 12px; }
+  .card { padding: 12px 12px; }
+  .card .n { font-size: 14px; }
+  .note { display: none; }
+  .legend { display: none; }
+  #listBtn { display: flex; bottom: 26px; }
+}
+</style></head><body>
+<header>
+  <div class="hrow"><h1>湘赣金秋 · 三代四人自驾 · 地图节点</h1>
+  <p class="sub">沙井 → 零陵·桐子坳 → 衡阳县西渡接人 → 韶山 → 井冈山黄洋界 → 信丰脐橙园 → 深圳　·　19 个节点，按天筛选，点击可跳高德</p></div>
+  <div class="chips"><button class="chip on" data-day="all">全部节点</button><button class="chip" data-day="11/14"><span class="dot" style="background:#c0392b"></span>11/14 深圳 → 零陵</button><button class="chip" data-day="11/15"><span class="dot" style="background:#b5651d"></span>11/15 桐子坳银杏</button><button class="chip" data-day="11/16"><span class="dot" style="background:#b07a2a"></span>11/16 接人 → 西渡</button><button class="chip" data-day="11/17"><span class="dot" style="background:#8a7a3a"></span>11/17 西渡办事 → 韶山</button><button class="chip" data-day="11/18"><span class="dot" style="background:#2f6f6a"></span>11/18 韶山</button><button class="chip" data-day="11/19"><span class="dot" style="background:#3f6b8a"></span>11/19 韶山 → 茨坪</button><button class="chip" data-day="11/20"><span class="dot" style="background:#8a4a6b"></span>11/20 黄洋界</button><button class="chip" data-day="11/21"><span class="dot" style="background:#6b6b3a"></span>11/21 茨坪 → 信丰</button><button class="chip" data-day="11/22"><span class="dot" style="background:#4a5c70"></span>11/22 信丰 → 深圳</button></div>
+</header>
+<div class="main">
+  <aside id="side"></aside>
+  <div id="sheetBg"></div>
+  <div style="flex:1;position:relative;min-width:0"><div id="map"></div>
+    <button id="tileBtn">卫星</button>
+    <button id="listBtn">节点列表</button>
+    <div class="note">坐标为示意位置，密集点位做了轻微错位；地图瓦片需联网加载。出发前请用高德按当天路况重新搜索，连线只表示顺序，不是实际路线。</div>
+  </div>
+</div>
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/markercluster.js"></script>
+<script>
+const NODES = [{"day": "11/14", "daylabel": "D1 深圳 → 零陵", "seq": 1, "cat": "起点", "catname": "起终点", "name": "深圳宝安沙井（家庭出发点）", "addr": "深圳市宝安区沙井街道，以自家车位为准", "note": "出发前填车位定位", "lat": 22.7362, "lon": 113.8066, "color": "#2c3e50"}, {"day": "11/14", "daylabel": "D1 深圳 → 零陵", "seq": 2, "cat": "午餐/补能", "catname": "餐饮", "name": "清远午餐补能", "addr": "清远市区或高速服务区", "note": "按当日路线选同方向站点", "lat": 23.682, "lon": 113.056, "color": "#d9822b"}, {"day": "11/14", "daylabel": "D1 深圳 → 零陵", "seq": 3, "cat": "住宿", "catname": "住宿", "name": "零陵住宿", "addr": "永州市零陵区，近主干道", "note": "连住两晚，两间房", "lat": 26.2205, "lon": 111.6205, "color": "#7b5ea7"}, {"day": "11/14", "daylabel": "D1 深圳 → 零陵", "seq": 4, "cat": "散步", "catname": "散步", "name": "零陵古城", "addr": "永州市零陵区大西门一带", "note": "傍晚慢走 60 分钟", "lat": 26.214, "lon": 111.628, "color": "#c0392b"}, {"day": "11/15", "daylabel": "D2 桐子坳银杏", "seq": 1, "cat": "核心景点", "catname": "景点", "name": "桐子坳景区", "addr": "永州市双牌县桐子坳", "note": "周日早到，平缓短线", "lat": 26.055, "lon": 111.845, "color": "#c0392b"}, {"day": "11/16", "daylabel": "D3 接人 → 西渡", "seq": 1, "cat": "接人", "catname": "接人", "name": "衡阳县井头镇", "addr": "衡阳县井头镇，具体村/门牌由家人提供", "note": "先在村口停稳再打电话", "lat": 26.9641, "lon": 112.1361, "color": "#b07a2a"}, {"day": "11/16", "daylabel": "D3 接人 → 西渡", "seq": 2, "cat": "住宿", "catname": "住宿", "name": "西渡住宿", "addr": "衡阳县西渡镇", "note": "住一晚，两间房", "lat": 26.971, "lon": 112.366, "color": "#7b5ea7"}, {"day": "11/17", "daylabel": "D4 西渡办事 → 韶山", "seq": 1, "cat": "办事", "catname": "途经", "name": "西渡办事地点", "addr": "衡阳县西渡镇，按实际定位", "note": "争取 12:00 前结束", "lat": 26.971, "lon": 112.366, "color": "#8a9691"}, {"day": "11/17", "daylabel": "D4 西渡办事 → 韶山", "seq": 2, "cat": "住宿", "catname": "住宿", "name": "韶山游客中心住宿区", "addr": "韶山市游客中心周边", "note": "连住两晚，问清停车换乘", "lat": 27.915, "lon": 112.527, "color": "#7b5ea7"}, {"day": "11/18", "daylabel": "D5 韶山", "seq": 1, "cat": "景点", "catname": "景点", "name": "韶山故居", "addr": "韶山市韶山乡韶山村", "note": "实名预约，按当日时段", "lat": 27.911, "lon": 112.494, "color": "#888"}, {"day": "11/18", "daylabel": "D5 韶山", "seq": 2, "cat": "景点", "catname": "景点", "name": "韶山纪念馆", "addr": "韶山市，故居附近", "note": "下午去，排队看情况", "lat": 27.915, "lon": 112.503, "color": "#888"}, {"day": "11/19", "daylabel": "D6 韶山 → 茨坪", "seq": 1, "cat": "住宿", "catname": "住宿", "name": "井冈山茨坪住宿", "addr": "井冈山市茨坪镇", "note": "连住两晚，电梯暖气停车", "lat": 26.573, "lon": 114.166, "color": "#7b5ea7"}, {"day": "11/19", "daylabel": "D6 韶山 → 茨坪", "seq": 2, "cat": "补能", "catname": "充电", "name": "井冈山市区快充", "addr": "井冈山市区，实时搜索", "note": "进山前 80—90%", "lat": 26.575, "lon": 114.17, "color": "#2f8f5b"}, {"day": "11/20", "daylabel": "D7 黄洋界", "seq": 1, "cat": "核心景点", "catname": "景点", "name": "黄洋界", "addr": "井冈山市黄洋界景区", "note": "看景交与天气公告", "lat": 26.615, "lon": 114.116, "color": "#c0392b"}, {"day": "11/20", "daylabel": "D7 黄洋界", "seq": 2, "cat": "备选", "catname": "备选", "name": "井冈山革命博物馆", "addr": "井冈山市茨坪镇", "note": "大雨大雾备选", "lat": 26.573, "lon": 114.166, "color": "#8a9691"}, {"day": "11/21", "daylabel": "D8 茨坪 → 信丰", "seq": 1, "cat": "午餐/补能", "catname": "餐饮", "name": "赣州（午餐补能）", "addr": "赣州市区或服务区", "note": "只吃饭补能，不进城", "lat": 25.83, "lon": 114.93, "color": "#d9822b"}, {"day": "11/21", "daylabel": "D8 茨坪 → 信丰", "seq": 2, "cat": "核心景点", "catname": "景点", "name": "中国赣南脐橙产业园", "addr": "信丰县安西镇", "note": "采摘、博览馆需预约", "lat": 25.3, "lon": 114.94, "color": "#c0392b"}, {"day": "11/21", "daylabel": "D8 茨坪 → 信丰", "seq": 3, "cat": "住宿", "catname": "住宿", "name": "信丰县城住宿", "addr": "信丰县城", "note": "两间房、电梯停车", "lat": 25.386, "lon": 114.933, "color": "#7b5ea7"}, {"day": "11/22", "daylabel": "D9 信丰 → 深圳", "seq": 1, "cat": "终点", "catname": "起终点", "name": "深圳宝安沙井（家）", "addr": "深圳市宝安区沙井街道", "note": "到家卸车休息", "lat": 22.7362, "lon": 113.8066, "color": "#2c3e50"}];
+const DAYCOLOR = {"11/14": "#c0392b", "11/15": "#b5651d", "11/16": "#b07a2a", "11/17": "#8a7a3a", "11/18": "#2f6f6a", "11/19": "#3f6b8a", "11/20": "#8a4a6b", "11/21": "#6b6b3a", "11/22": "#4a5c70"};
+function wgs2gcj(lat, lon) {
+  const a = 6378245.0, ee = 0.00669342162296594323;
+  const x = lon - 105.0, y = lat - 35.0;
+  if (lon < 72.004 || lon > 137.8347 || lat < 0.8293 || lat > 55.8271) return [lat, lon];
+  const tlat = -100.0 + 2.0*x + 3.0*y + 0.2*y*y + 0.1*x*y + 0.2*Math.sqrt(Math.abs(x)) + (20.0*Math.sin(6.0*x*Math.PI) + 20.0*Math.sin(2.0*x*Math.PI))*2.0/3.0 + (20.0*Math.sin(y*Math.PI) + 40.0*Math.sin(y/3.0*Math.PI))*2.0/3.0 + (160.0*Math.sin(y/12.0*Math.PI) + 320*Math.sin(y*Math.PI/30.0))*2.0/3.0;
+  const tlon = 300.0 + x + 2.0*y + 0.1*x*x + 0.1*x*y + 0.1*Math.sqrt(Math.abs(x)) + (20.0*Math.sin(6.0*x*Math.PI) + 20.0*Math.sin(2.0*x*Math.PI))*2.0/3.0 + (20.0*Math.sin(x*Math.PI) + 40.0*Math.sin(x/3.0*Math.PI))*2.0/3.0 + (150.0*Math.sin(x/12.0*Math.PI) + 300.0*Math.sin(x/30.0*Math.PI))*2.0/3.0;
+  const radlat = lat / 180.0 * Math.PI;
+  let magic = Math.sin(radlat); magic = 1 - ee*magic*magic;
+  const sqrtmagic = Math.sqrt(magic);
+  const dlat = (tlat*180.0) / ((a*(1-ee)) / (magic*sqrtmagic) * Math.PI);
+  const dlon = (tlon*180.0) / (a / sqrtmagic * Math.cos(radlat) * Math.PI);
+  return [lat + dlat, lon + dlon];
+}
+const amapUrl = (n) => 'https://uri.amap.com/search?keyword=' + encodeURIComponent(n.name + ' ' + n.addr);
+const RAD = (q, name, size) => `https://webrd0${q}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}`;
+const SAT = (q) => `https://webst0${q}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}`;
+const map = L.map('map', {zoomControl: true, attributionControl: true, zoomSnap: 0.25}).setView([25.3, 113.25], 7.0);
+const road = L.tileLayer(RAD(1, 1, 1), {maxZoom: 18, subdomains: []});
+const sat = L.tileLayer(SAT(1), {maxZoom: 18});
+road.addTo(map);
+let satOn = false;
+const tileBtn = document.getElementById('tileBtn');
+tileBtn.addEventListener('click', () => {
+  if (!satOn) { map.removeLayer(road); sat.addTo(map); } else { map.removeLayer(sat); road.addTo(map); }
+  satOn = !satOn;
+  tileBtn.textContent = satOn ? '路网' : '卫星';
+  map.eachLayer(l => { if (l.bringToFront) l.bringToFront(); });
+});
+map.attributionControl.setPrefix('');
+map.attributionControl.addAttribution('地图 © 高德地图 · 节点为示意位置');
+
+const dayGroups = {};
+NODES.forEach(n => { (dayGroups[n.day] = dayGroups[n.day] || []).push(n); });
+const cluster = L.markerClusterGroup({
+  showCoverageOnHover: false, maxClusterRadius: 36, disableClusteringAtZoom: 13,
+  spiderfyOnMaxZoom: true, zoomToBoundsOnClick: true,
+  iconCreateFunction: (c) => L.divIcon({html: '<div class="cluster">' + c.getChildCount() + '</div>', className: '', iconSize: [34,34]})
+});
+map.addLayer(cluster);
+const markers = [], lines = [];
+Object.keys(dayGroups).forEach(day => {
+  const arr = dayGroups[day];
+  const color = DAYCOLOR[day];
+  const latlngs = arr.map(n => wgs2gcj(n.lat, n.lon));
+  const line = L.polyline(latlngs, {color, weight: 3, opacity: .65, dashArray: '1 0'}).addTo(map);
+  lines.push({day, line});
+  arr.forEach((n, i) => {
+    const big = (n.cat === '核心景点' || n.cat === '起点' || n.cat === '终点');
+    const ic = L.divIcon({
+      className: '', iconSize: big ? [26,26] : [20,20], iconAnchor: big ? [13,13] : [10,10],
+      html: `<div class="pin ${big?'big':'sm'}" style="background:${n.color}">${n.seq}</div>`
+    });
+    const m = L.marker(latlngs[i], {icon: ic, title: n.name});
+    m.bindPopup(`<div class="pop"><b>${n.name}</b><div class="p1">${n.day} · ${n.cat}</div><div class="p2">${n.addr}</div><div class="p2" style="color:#a9741f">${n.note}</div><a href="${amapUrl(n)}" target="_blank" rel="noopener">在高德地图搜索 ↗</a></div>`, {maxWidth: 260});
+    m.day = day; m.node = n;
+    cluster.addLayer(m);
+    markers.push(m);
+  });
+});
+
+function renderSidebar(day) {
+  const box = document.getElementById('side');
+  box.innerHTML = '';
+  Object.keys(dayGroups).filter(d => day === 'all' || d === day).forEach(d => {
+    const h = document.createElement('h2');
+    h.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${DAYCOLOR[d]};margin-right:6px"></span>${d}　${dayGroups[d][0].daylabel.split(' ').slice(1).join(' ')}`;
+    box.appendChild(h);
+    dayGroups[d].forEach((n, i) => {
+      const c = document.createElement('div');
+      c.className = 'card';
+      c.innerHTML = `<div class="n"><i style="background:${n.color}">${n.seq}</i>${n.name}</div><div class="a">${n.addr}</div><div class="m"><span>${n.cat}</span><span>${n.note}</span></div>`;
+      c.onclick = () => { const m = markers.find(x => x.node === n); if (m) { map.flyTo(m.getLatLng(), 13, {duration: .8}); m.openPopup(); } if (window.closeSheet) closeSheet(); };
+      box.appendChild(c);
+    });
+  });
+}
+function wgs2gcjLatLng(n) { const p = wgs2gcj(n.lat, n.lon); return L.latLng(p[0], p[1]); }
+
+let current = 'all';
+function setDay(day) {
+  current = day;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.day === day));
+  cluster.clearLayers();
+  markers.forEach(m => { if (day === 'all' || m.day === day) cluster.addLayer(m); });
+  lines.forEach(l => { if (day === 'all' || l.day === day) l.line.addTo(map); else l.line.remove(); });
+  renderSidebar(day);
+  const pts = markers.filter(m => day === 'all' || m.day === day).map(m => m.getLatLng());
+  if (pts.length) {
+    const b = L.latLngBounds(pts).pad(.06);
+    const mobile = window.innerWidth <= 860;
+    const apply = () => {
+      if (mobile && day === 'all') map.setView([25.3, 113.25], 7.0);
+      else map.fitBounds(b, {maxZoom: day === 'all' ? 8 : 12});
+    };
+    apply();
+    setTimeout(() => { map.invalidateSize(); apply(); }, 400);
+  }
+}
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => setDay(c.dataset.day));
+setDay('all');
+</script>
+<script>
+(function(){
+  var side=document.getElementById('side'), btn=document.getElementById('listBtn'), bg=document.getElementById('sheetBg');
+  window.closeSheet=function(){ side.classList.remove('open'); bg.classList.remove('show'); };
+  btn.addEventListener('click', function(){ side.classList.toggle('open'); bg.classList.toggle('show'); });
+  bg.addEventListener('click', window.closeSheet);
+  if (window.innerWidth <= 860) { setTimeout(function(){ map.invalidateSize(); }, 300); }
+  window.addEventListener('resize', function(){ map.invalidateSize(); });
+})();
+</script>
+<script>
+var lc = L.control({position:'bottomright'});
+lc.onAdd = function(){ var d = L.DomUtil.create('div', 'legend'); d.innerHTML = '<b>图例</b><br><i style="background:#2c3e50"></i>起终点<br><i style="background:#7b5ea7"></i>住宿<br><i style="background:#d9822b"></i>餐饮<br><i style="background:#2f8f5b"></i>充电<br><i style="background:#c0392b"></i>景点<br><i style="background:#b07a2a"></i>接人<br><i style="background:#8a9691"></i>途经<br>'; return d; };
+lc.addTo(map);
+</script>
+</body></html>
