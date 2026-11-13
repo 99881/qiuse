@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """每天 20:30（北京时间）把「今晚准备 + 明天行程」推到飞书/企业微信/钉钉群机器人。
 
-需要的环境变量（配一个就行）：
+支持的发送方式（配一种就行）：
+  FEISHU_APP_ID + FEISHU_APP_SECRET + FEISHU_CHAT_ID   飞书自建应用（推荐）
   FEISHU_WEBHOOK   飞书群机器人地址
   WECOM_WEBHOOK    企业微信群机器人地址
   DINGTALK_WEBHOOK 钉钉群机器人地址
@@ -78,10 +79,44 @@ def build(days, today):
     return "\n".join(lines)
 
 
+def feishu_app_send(text, app_id, app_secret, receive_id, receive_type="chat_id"):
+    """用飞书自建应用发到指定群。"""
+    body = json.dumps({"app_id": app_id, "app_secret": app_secret}).encode()
+    req = urllib.request.Request(
+        "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
+        data=body, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        token = json.load(r).get("tenant_access_token")
+    if not token:
+        raise RuntimeError("拿不到 tenant_access_token")
+    payload = {
+        "receive_id": receive_id,
+        "msg_type": "text",
+        "content": json.dumps({"text": text}, ensure_ascii=False),
+    }
+    req = urllib.request.Request(
+        "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=" + receive_type,
+        data=json.dumps(payload, ensure_ascii=False).encode(),
+        headers={"Content-Type": "application/json; charset=utf-8",
+                 "Authorization": "Bearer " + token})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        print("feishu sent:", r.read()[:200])
+
+
 def send(text):
     if os.environ.get("DRY_RUN") == "1":
         print(text)
         return
+    if os.environ.get("FEISHU_APP_ID") and os.environ.get("FEISHU_APP_SECRET"):
+        if os.environ.get("FEISHU_OPEN_ID"):
+            feishu_app_send(text, os.environ["FEISHU_APP_ID"], os.environ["FEISHU_APP_SECRET"],
+                            os.environ["FEISHU_OPEN_ID"], "open_id")
+            return
+        if os.environ.get("FEISHU_CHAT_ID"):
+            feishu_app_send(text, os.environ["FEISHU_APP_ID"], os.environ["FEISHU_APP_SECRET"],
+                            os.environ["FEISHU_CHAT_ID"], "chat_id")
+            return
+
     payloads = []
     if os.environ.get("FEISHU_WEBHOOK"):
         payloads.append((os.environ["FEISHU_WEBHOOK"],
