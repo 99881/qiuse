@@ -70,7 +70,16 @@ def build(days, today):
         hi, lo, pp, mm = wx
         lines.append("天气：{:.0f}—{:.0f}℃，降雨 {}%，{} mm".format(lo, hi, pp, mm))
     lines.append("")
-    lines.append("今晚要做：")
+    lines.append("明天怎么走：")
+    for t, what in day.get("timeline", []):
+        lines.append("  {} {}".format(t, what))
+    if day.get("bring"):
+        lines.append("")
+        lines.append("明天要带下车：")
+        for b in day["bring"]:
+            lines.append("  · " + b)
+    lines.append("")
+    lines.append("今晚要准备：")
     for i, p in enumerate(day["prep"], 1):
         lines.append("{}. {}".format(i, p))
     lines.append("")
